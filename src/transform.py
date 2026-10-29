@@ -16,6 +16,7 @@ def clean_orders(df: pd.DataFrame) -> pd.DataFrame:
     df = df[df["quantity"] > 0].copy()
     df["total"] = (df["quantity"] * df["unit_price"]).round(2)
     df["year_month"] = df["order_date"].dt.strftime("%Y-%m")
+    df["order_date"] = df["order_date"].dt.date
     return df
 
 

@@ -32,6 +32,14 @@ def ensure_bucket() -> None:
         else:
             raise
 
+def clear_prefix() -> None:
+    """Borra los archivos anteriores para no mezclar cargas distintas."""
+    paginator = s3.get_paginator("list_objects_v2")
+    for page in paginator.paginate(Bucket=BUCKET, Prefix=f"{PREFIX}/"):
+        objs = [{"Key": o["Key"]} for o in page.get("Contents", [])]
+        if objs:
+            s3.delete_objects(Bucket=BUCKET, Delete={"Objects": objs})
+            print(f"Eliminados {len(objs)} archivos antiguos")
 
 def upload_files() -> None:
     files = list(LOCAL_DIR.rglob("*.parquet"))
@@ -46,4 +54,5 @@ def upload_files() -> None:
 
 if __name__ == "__main__":
     ensure_bucket()
+    clear_prefix()
     upload_files()
